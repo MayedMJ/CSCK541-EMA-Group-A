@@ -22,6 +22,18 @@ class RecordErrorMessage:
             "The record id is not valid with reason: "
             "id must be a positive integer"
         ),
+        "storage_json_invalid": (
+            "The record storage is not valid with reason: "
+            "file does not contain valid JSON"
+        ),
+        "storage_root_not_list": (
+            "The record storage is not valid with reason: "
+            "JSON root must be a list"
+        ),
+        "storage_item_not_dictionary": (
+            "The record storage is not valid with reason: "
+            "item at index {index} must be a dictionary"
+        ),
     }
 
     @classmethod

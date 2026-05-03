@@ -8,6 +8,8 @@ from .exceptions import (
     RecordNotFoundError,
     RecordValidationError,
 )
+from .repository import RecordRepository
+from .storage import JsonRecordRepository
 
 __all__ = [
     "AIRLINE_TYPE",
@@ -16,6 +18,8 @@ __all__ = [
     "RecordErrorMessage",
     "RecordConflictError",
     "RecordNotFoundError",
+    "RecordRepository",
     "RecordType",
     "RecordValidationError",
+    "JsonRecordRepository",
 ]
