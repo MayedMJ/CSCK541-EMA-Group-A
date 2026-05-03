@@ -22,6 +22,26 @@ class RecordErrorMessage:
             "The record id is not valid with reason: "
             "id must be a positive integer"
         ),
+        "record_type_mismatch": (
+            "The record type is not valid with reason: "
+            "payload type must be {record_type}"
+        ),
+        "record_payload_missing_field": (
+            "The record payload is not valid with reason: "
+            "missing field: {field}"
+        ),
+        "record_payload_unknown_field": (
+            "The record payload is not valid with reason: "
+            "unknown field: {field}"
+        ),
+        "record_payload_field_not_string": (
+            "The record payload is not valid with reason: "
+            "field {field} must be a string"
+        ),
+        "record_payload_field_empty": (
+            "The record payload is not valid with reason: "
+            "field {field} cannot be empty"
+        ),
         "storage_json_invalid": (
             "The record storage is not valid with reason: "
             "file does not contain valid JSON"
