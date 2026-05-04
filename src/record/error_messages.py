@@ -11,6 +11,10 @@ class RecordErrorMessage:
             "The record payload is not valid with reason: "
             "payload must be a dictionary"
         ),
+        "record_update_payload_not_dictionary": (
+            "The record update payload is not valid with reason: "
+            "updates must be a dictionary"
+        ),
         "record_type_not_allowed": (
             "The record type is not allowed with recordType: {record_type}"
         ),
@@ -25,6 +29,10 @@ class RecordErrorMessage:
         "record_type_mismatch": (
             "The record type is not valid with reason: "
             "payload type must be {record_type}"
+        ),
+        "record_id_cannot_be_changed": (
+            "The record update is not valid with reason: "
+            "id cannot be changed"
         ),
         "record_payload_missing_field": (
             "The record payload is not valid with reason: "
@@ -57,6 +65,11 @@ class RecordErrorMessage:
         "record_related_not_found": (
             "The related record is not found with recordType: "
             "{record_type}, recordId: {record_id}"
+        ),
+        "record_delete_conflict_linked_flights": (
+            "The record cannot be deleted with recordType: "
+            "{record_type}, recordId: {record_id}, "
+            "reason: related flight records exist"
         ),
         "storage_json_invalid": (
             "The record storage is not valid with reason: "
