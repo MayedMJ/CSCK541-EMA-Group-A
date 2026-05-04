@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from .contracts import AIRLINE_TYPE, CLIENT_TYPE, RecordType
+from .contracts import ALLOWED_RECORD_TYPES, RecordType, get_relation_dependencies
 from .error_messages import RecordErrorMessage
 from .exceptions import RecordNotFoundError, RecordValidationError
 from .repository import RecordRepository
@@ -27,8 +27,7 @@ class RecordService:
         self._repository = repository or JsonRecordRepository("src/record/record.json")
         self._records: list[dict[str, Any]] = []
         self._next_ids: dict[RecordType, int] = {
-            CLIENT_TYPE: 1,
-            AIRLINE_TYPE: 1,
+            record_type: 1 for record_type in ALLOWED_RECORD_TYPES
         }
         if auto_load:
             self.load()
@@ -59,12 +58,18 @@ class RecordService:
     ) -> dict[str, Any]:
         if not isinstance(payload, dict):
             self._raise_validation_error("record_payload_not_dictionary")
-        if record_type not in {CLIENT_TYPE, AIRLINE_TYPE}:
+        if record_type not in ALLOWED_RECORD_TYPES:
             self._raise_validation_error(
                 "record_type_not_allowed", record_type=record_type
             )
 
         normalized_payload = validate_record_payload(record_type, payload)
+
+        for related_type, related_field in get_relation_dependencies(record_type):
+            self._assert_related_record_exists(
+                related_type, normalized_payload[related_field]
+            )
+
         new_record = dict(normalized_payload)
         new_record["id"] = self._generate_id(record_type)
         new_record["type"] = record_type
@@ -114,7 +119,7 @@ class RecordService:
         return next_id
 
     def _rebuild_next_ids(self) -> None:
-        for record_type in (CLIENT_TYPE, AIRLINE_TYPE):
+        for record_type in ALLOWED_RECORD_TYPES:
             max_id = 0
             for record in self._records:
                 if record.get("type") == record_type and isinstance(
@@ -122,3 +127,19 @@ class RecordService:
                 ):
                     max_id = max(max_id, record["id"])
             self._next_ids[record_type] = max_id + 1
+
+    def _assert_related_record_exists(
+        self,
+        record_type: RecordType,
+        record_id: Any,
+    ) -> None:
+        normalized_id = self._normalize_record_id(record_id)
+        for record in self._records:
+            if record.get("type") == record_type and record.get("id") == normalized_id:
+                return
+
+        self._raise_validation_error(
+            "record_related_not_found",
+            record_type=record_type,
+            record_id=normalized_id,
+        )

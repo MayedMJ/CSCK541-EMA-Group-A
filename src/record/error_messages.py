@@ -42,6 +42,22 @@ class RecordErrorMessage:
             "The record payload is not valid with reason: "
             "field {field} cannot be empty"
         ),
+        "record_payload_field_not_integer": (
+            "The record payload is not valid with reason: "
+            "field {field} must be an integer"
+        ),
+        "record_payload_field_not_positive_integer": (
+            "The record payload is not valid with reason: "
+            "field {field} must be a positive integer"
+        ),
+        "record_payload_field_not_iso_datetime": (
+            "The record payload is not valid with reason: "
+            "field {field} must be an ISO date/time string"
+        ),
+        "record_related_not_found": (
+            "The related record is not found with recordType: "
+            "{record_type}, recordId: {record_id}"
+        ),
         "storage_json_invalid": (
             "The record storage is not valid with reason: "
             "file does not contain valid JSON"

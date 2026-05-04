@@ -2,25 +2,16 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
-from .contracts import AIRLINE_TYPE, CLIENT_TYPE, RecordType
+from .contracts import ALLOWED_RECORD_TYPES, CLIENT_TYPE, RecordType, get_record_schema
 from .error_messages import RecordErrorMessage
 from .exceptions import RecordValidationError
 
-_CLIENT_FIELDS = {
-    "name",
-    "address_line_1",
-    "address_line_2",
-    "address_line_3",
-    "city",
-    "state",
-    "zip_code",
-    "country",
-    "phone_number",
-}
-_AIRLINE_FIELDS = {"company_name"}
-_OPTIONAL_EMPTY_STRING_FIELDS = {"address_line_2", "address_line_3"}
+_CLIENT_OPTIONAL_EMPTY_FIELDS = get_record_schema(
+    CLIENT_TYPE
+).optional_empty_string_fields
 
 
 def validate_record_payload(
@@ -31,13 +22,14 @@ def validate_record_payload(
         raise RecordValidationError(
             RecordErrorMessage.from_("record_payload_not_dictionary")
         )
-    if record_type not in {CLIENT_TYPE, AIRLINE_TYPE}:
+    if record_type not in ALLOWED_RECORD_TYPES:
         raise RecordValidationError(
             RecordErrorMessage.from_("record_type_not_allowed", record_type=record_type)
         )
 
     _validate_type_field(record_type, payload)
-    fields = _CLIENT_FIELDS if record_type == CLIENT_TYPE else _AIRLINE_FIELDS
+    schema = get_record_schema(record_type)
+    fields = set(schema.required_fields)
     _assert_no_unknown_fields(payload, fields)
     _assert_required_fields(payload, fields)
 
@@ -54,8 +46,17 @@ def validate_record_payload(
             "phone_number": _as_string(payload, "phone_number"),
         }
 
+    if record_type == "airline":
+        return {
+            "company_name": _as_string(payload, "company_name"),
+        }
+
     return {
-        "company_name": _as_string(payload, "company_name"),
+        "client_id": _as_positive_int(payload, "client_id"),
+        "airline_id": _as_positive_int(payload, "airline_id"),
+        "date": _as_iso_datetime(payload, "date"),
+        "start_city": _as_string(payload, "start_city"),
+        "end_city": _as_string(payload, "end_city"),
     }
 
 
@@ -74,7 +75,7 @@ def validate_stored_record(record: dict[str, Any]) -> dict[str, Any]:
         raise RecordValidationError(
             RecordErrorMessage.from_("record_payload_missing_field", field="id")
         )
-    record_id = _as_positive_int(record["id"])
+    record_id = _as_positive_int(record, "id")
     payload = validate_record_payload(record_type, record)
     payload["id"] = record_id
     payload["type"] = record_type
@@ -87,7 +88,7 @@ def _as_record_type(value: Any) -> RecordType:
             RecordErrorMessage.from_("record_type_not_allowed", record_type=value)
         )
     normalized = value.strip().lower()
-    if normalized not in {CLIENT_TYPE, AIRLINE_TYPE}:
+    if normalized not in ALLOWED_RECORD_TYPES:
         raise RecordValidationError(
             RecordErrorMessage.from_("record_type_not_allowed", record_type=normalized)
         )
@@ -133,28 +134,57 @@ def _as_string(payload: dict[str, Any], field: str, *, allow_empty: bool = False
         raise RecordValidationError(
             RecordErrorMessage.from_("record_payload_field_empty", field=field)
         )
-    if allow_empty and field in _OPTIONAL_EMPTY_STRING_FIELDS and not normalized:
+    if allow_empty and field in _CLIENT_OPTIONAL_EMPTY_FIELDS and not normalized:
         return ""
     return normalized
 
 
-def _as_positive_int(value: Any) -> int:
+def _as_positive_int(payload: dict[str, Any], field: str) -> int:
+    value = payload.get(field)
     if isinstance(value, bool):
         raise RecordValidationError(
-            RecordErrorMessage.from_("record_id_not_positive_integer")
+            RecordErrorMessage.from_("record_payload_field_not_integer", field=field)
         )
+
     if isinstance(value, int):
         parsed = value
     elif isinstance(value, str) and value.strip().isdigit():
         parsed = int(value.strip())
     else:
         raise RecordValidationError(
-            RecordErrorMessage.from_("record_id_not_positive_integer")
+            RecordErrorMessage.from_("record_payload_field_not_integer", field=field)
         )
 
     if parsed <= 0:
         raise RecordValidationError(
-            RecordErrorMessage.from_("record_id_not_positive_integer")
+            RecordErrorMessage.from_(
+                "record_payload_field_not_positive_integer", field=field
+            )
         )
 
     return parsed
+
+
+def _as_iso_datetime(payload: dict[str, Any], field: str) -> str:
+    value = payload.get(field)
+    if not isinstance(value, str):
+        raise RecordValidationError(
+            RecordErrorMessage.from_(
+                "record_payload_field_not_iso_datetime", field=field
+            )
+        )
+
+    candidate = value.strip()
+    if candidate.endswith("Z"):
+        candidate = candidate[:-1] + "+00:00"
+
+    try:
+        parsed = datetime.fromisoformat(candidate)
+    except ValueError as exc:
+        raise RecordValidationError(
+            RecordErrorMessage.from_(
+                "record_payload_field_not_iso_datetime", field=field
+            )
+        ) from exc
+
+    return parsed.isoformat(timespec="seconds")

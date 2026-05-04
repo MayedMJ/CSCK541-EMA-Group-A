@@ -1,6 +1,6 @@
 """Record management package."""
 
-from .contracts import AIRLINE_TYPE, CLIENT_TYPE, RecordType
+from .contracts import AIRLINE_TYPE, CLIENT_TYPE, FLIGHT_TYPE, RecordType
 from .error_messages import RecordErrorMessage
 from .exceptions import (
     RecordConflictError,
@@ -15,6 +15,7 @@ from .storage import JsonRecordRepository
 __all__ = [
     "AIRLINE_TYPE",
     "CLIENT_TYPE",
+    "FLIGHT_TYPE",
     "RecordError",
     "RecordErrorMessage",
     "RecordConflictError",
