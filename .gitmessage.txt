@@ -1,0 +1,21 @@
+record: Summarize the change in present tense.
+
+Why:
+- Explain motivation and impact.
+
+What:
+- List high-level changes.
+- Keep each bullet concise.
+
+Notes:
+- Optional trade-offs, follow-ups, or risks.
+
+# Rules (PyInstaller-style):
+# - First line: "<subsystem>: <short sentence>."
+# - Present tense.
+# - Prefix with subsystem.
+# - End first line with a period.
+# - Keep first line <= 72 chars (target <= 50).
+# - Blank line after first line.
+# - Wrap body to ~72 chars.
+
