@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from copy import deepcopy
 from types import MappingProxyType
 from typing import Any
-from collections.abc import Mapping
 
 
 def freeze_record(record: dict[str, Any]) -> Mapping[str, Any]:

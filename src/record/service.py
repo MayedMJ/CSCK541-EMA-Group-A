@@ -169,9 +169,7 @@ class RecordService:
         self._records = self._records[:idx] + (frozen,) + self._records[idx + 1 :]
 
         LOGGER.info(
-            "The record is updated with recordType: {}, recordId: {}".format(
-                record_type, normalized_id
-            )
+            f"The record is updated with recordType: {record_type}, recordId: {normalized_id}"
         )
         return thaw_record(frozen)
 
@@ -186,9 +184,7 @@ class RecordService:
         self._records = self._records[:idx] + self._records[idx + 1 :]
 
         LOGGER.info(
-            "The record is deleted with recordType: {}, recordId: {}".format(
-                record_type, normalized_id
-            )
+            f"The record is deleted with recordType: {record_type}, recordId: {normalized_id}"
         )
         return thaw_record(deleted)
 
