@@ -46,6 +46,47 @@ class RecordService:
         """Closes the service and persists pending changes."""
         self.save()
 
+
+    def list_records(
+        self, record_type: RecordType | None = None
+    ) -> list[dict[str, Any]]:
+        if record_type is None:
+            return [dict(record) for record in self._records]
+        return [
+            dict(record)
+            for record in self._records
+            if record.get("type") == record_type
+        ]
+
+    def search_records(
+        self,
+        record_type: RecordType | None = None,
+        **filters: Any,
+    ) -> list[dict[str, Any]]:
+        candidates = (
+            self._records
+            if record_type is None
+            else [r for r in self._records if r.get("type") == record_type]
+        )
+        matched: list[dict[str, Any]] = []
+        for record in candidates:
+            ok = True
+            for key, expected in filters.items():
+                if key not in record:
+                    ok = False
+                    break
+                value = record[key]
+                if isinstance(value, str) and isinstance(expected, str):
+                    if value.lower() != expected.lower():
+                        ok = False
+                        break
+                elif value != expected:
+                    ok = False
+                    break
+            if ok:
+                matched.append(dict(record))
+        return matched
+
     def get_record(self, record_type: RecordType, record_id: int) -> dict[str, Any]:
         normalized_id = self._normalize_record_id(record_id)
         idx = self._find_index(record_type, normalized_id)
