@@ -1,0 +1,124 @@
+"""Service layer for record create/get and lifecycle operations."""
+
+from __future__ import annotations
+
+import logging
+from typing import Any
+
+from .contracts import AIRLINE_TYPE, CLIENT_TYPE, RecordType
+from .error_messages import RecordErrorMessage
+from .exceptions import RecordNotFoundError, RecordValidationError
+from .repository import RecordRepository
+from .storage import JsonRecordRepository
+from .validators import validate_record_payload, validate_stored_record
+
+LOGGER = logging.getLogger(__name__)
+
+
+class RecordService:
+    """Application service that stores records as list-of-dictionaries."""
+
+    def __init__(
+        self,
+        repository: RecordRepository | None = None,
+        *,
+        auto_load: bool = True,
+    ) -> None:
+        self._repository = repository or JsonRecordRepository("src/record/record.json")
+        self._records: list[dict[str, Any]] = []
+        self._next_ids: dict[RecordType, int] = {
+            CLIENT_TYPE: 1,
+            AIRLINE_TYPE: 1,
+        }
+        if auto_load:
+            self.load()
+
+    def load(self) -> None:
+        """Loads records from storage."""
+        loaded = self._repository.load_records()
+        self._records = [validate_stored_record(record) for record in loaded]
+        self._rebuild_next_ids()
+
+    def save(self) -> None:
+        """Saves records to storage."""
+        self._repository.save_records(self._records)
+
+    def close(self) -> None:
+        """Closes the service and persists pending changes."""
+        self.save()
+
+    def get_record(self, record_type: RecordType, record_id: int) -> dict[str, Any]:
+        normalized_id = self._normalize_record_id(record_id)
+        idx = self._find_index(record_type, normalized_id)
+        return dict(self._records[idx])
+
+    def create_record(
+        self,
+        record_type: RecordType,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not isinstance(payload, dict):
+            self._raise_validation_error("record_payload_not_dictionary")
+        if record_type not in {CLIENT_TYPE, AIRLINE_TYPE}:
+            self._raise_validation_error(
+                "record_type_not_allowed", record_type=record_type
+            )
+
+        normalized_payload = validate_record_payload(record_type, payload)
+        new_record = dict(normalized_payload)
+        new_record["id"] = self._generate_id(record_type)
+        new_record["type"] = record_type
+        self._records.append(new_record)
+
+        LOGGER.info(
+            "The record is created with recordType: {}, recordId: {}".format(
+                record_type, new_record["id"]
+            )
+        )
+        return dict(new_record)
+
+    def _find_index(self, record_type: RecordType, record_id: int) -> int:
+        for index, record in enumerate(self._records):
+            if record.get("type") == record_type and record.get("id") == record_id:
+                return index
+
+        error_text = RecordErrorMessage.from_(
+            "record_not_found", record_type=record_type, record_id=record_id
+        )
+        LOGGER.debug(error_text)
+        raise RecordNotFoundError(error_text)
+
+    def _raise_validation_error(self, key: str, **kwargs: object) -> None:
+        error_text = RecordErrorMessage.from_(key, **kwargs)
+        LOGGER.warning(error_text)
+        raise RecordValidationError(error_text)
+
+    def _normalize_record_id(self, record_id: Any) -> int:
+        if isinstance(record_id, bool):
+            self._raise_validation_error("record_id_not_positive_integer")
+        if isinstance(record_id, int):
+            parsed = record_id
+        elif isinstance(record_id, str) and record_id.strip().isdigit():
+            parsed = int(record_id.strip())
+        else:
+            self._raise_validation_error("record_id_not_positive_integer")
+
+        if parsed <= 0:
+            self._raise_validation_error("record_id_not_positive_integer")
+
+        return parsed
+
+    def _generate_id(self, record_type: RecordType) -> int:
+        next_id = self._next_ids[record_type]
+        self._next_ids[record_type] += 1
+        return next_id
+
+    def _rebuild_next_ids(self) -> None:
+        for record_type in (CLIENT_TYPE, AIRLINE_TYPE):
+            max_id = 0
+            for record in self._records:
+                if record.get("type") == record_type and isinstance(
+                    record.get("id"), int
+                ):
+                    max_id = max(max_id, record["id"])
+            self._next_ids[record_type] = max_id + 1

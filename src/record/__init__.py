@@ -9,6 +9,7 @@ from .exceptions import (
     RecordValidationError,
 )
 from .repository import RecordRepository
+from .service import RecordService
 from .storage import JsonRecordRepository
 
 __all__ = [
@@ -19,6 +20,7 @@ __all__ = [
     "RecordConflictError",
     "RecordNotFoundError",
     "RecordRepository",
+    "RecordService",
     "RecordType",
     "RecordValidationError",
     "JsonRecordRepository",
