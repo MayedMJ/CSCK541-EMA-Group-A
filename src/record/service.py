@@ -1,8 +1,9 @@
-"""Service layer for record create/get and lifecycle operations."""
+"""Service layer for record CRUD and search operations."""
 
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from typing import Any
 
 from .contracts import (
@@ -14,6 +15,7 @@ from .contracts import (
 )
 from .error_messages import RecordErrorMessage
 from .exceptions import RecordConflictError, RecordNotFoundError, RecordValidationError
+from .immutability import freeze_record, thaw_record
 from .repository import RecordRepository
 from .storage import JsonRecordRepository
 from .validators import validate_record_payload, validate_stored_record
@@ -31,22 +33,28 @@ class RecordService:
         auto_load: bool = True,
     ) -> None:
         self._repository = repository or JsonRecordRepository("src/record/record.json")
-        self._records: list[dict[str, Any]] = []
+        self._records: tuple[Mapping[str, Any], ...] = ()
         self._next_ids: dict[RecordType, int] = {
             record_type: 1 for record_type in ALLOWED_RECORD_TYPES
         }
         if auto_load:
             self.load()
 
+    @property
+    def records(self) -> list[dict[str, Any]]:
+        """Returns a detached snapshot of all records."""
+        return [thaw_record(record) for record in self._records]
+
     def load(self) -> None:
         """Loads records from storage."""
         loaded = self._repository.load_records()
-        self._records = [validate_stored_record(record) for record in loaded]
+        validated = [validate_stored_record(record) for record in loaded]
+        self._records = tuple(freeze_record(record) for record in validated)
         self._rebuild_next_ids()
 
     def save(self) -> None:
         """Saves records to storage."""
-        self._repository.save_records(self._records)
+        self._repository.save_records(self.records)
 
     def close(self) -> None:
         """Closes the service and persists pending changes."""
@@ -56,9 +64,9 @@ class RecordService:
         self, record_type: RecordType | None = None
     ) -> list[dict[str, Any]]:
         if record_type is None:
-            return [dict(record) for record in self._records]
+            return [thaw_record(record) for record in self._records]
         return [
-            dict(record)
+            thaw_record(record)
             for record in self._records
             if record.get("type") == record_type
         ]
@@ -71,7 +79,7 @@ class RecordService:
         candidates = (
             self._records
             if record_type is None
-            else [r for r in self._records if r.get("type") == record_type]
+            else tuple(r for r in self._records if r.get("type") == record_type)
         )
         matched: list[dict[str, Any]] = []
         for record in candidates:
@@ -89,13 +97,13 @@ class RecordService:
                     ok = False
                     break
             if ok:
-                matched.append(dict(record))
+                matched.append(thaw_record(record))
         return matched
 
     def get_record(self, record_type: RecordType, record_id: int) -> dict[str, Any]:
         normalized_id = self._normalize_record_id(record_id)
         idx = self._find_index(record_type, normalized_id)
-        return dict(self._records[idx])
+        return thaw_record(self._records[idx])
 
     def create_record(
         self,
@@ -119,14 +127,14 @@ class RecordService:
         new_record = dict(normalized_payload)
         new_record["id"] = self._generate_id(record_type)
         new_record["type"] = record_type
-        self._records.append(new_record)
 
+        self._records = (*self._records, freeze_record(new_record))
         LOGGER.info(
             "The record is created with recordType: {}, recordId: {}".format(
                 record_type, new_record["id"]
             )
         )
-        return dict(new_record)
+        return thaw_record(self._records[-1])
 
     def update_record(
         self,
@@ -139,7 +147,7 @@ class RecordService:
 
         normalized_id = self._normalize_record_id(record_id)
         idx = self._find_index(record_type, normalized_id)
-        updated = dict(self._records[idx])
+        updated = thaw_record(self._records[idx])
         if "id" in updates and updates["id"] != normalized_id:
             self._raise_validation_error("record_id_cannot_be_changed")
         if "type" in updates and updates["type"] != record_type:
@@ -157,14 +165,16 @@ class RecordService:
         updated_record = dict(normalized_payload)
         updated_record["id"] = normalized_id
         updated_record["type"] = record_type
-        self._records[idx] = updated_record
+
+        frozen = freeze_record(updated_record)
+        self._records = self._records[:idx] + (frozen,) + self._records[idx + 1 :]
 
         LOGGER.info(
             "The record is updated with recordType: {}, recordId: {}".format(
                 record_type, normalized_id
             )
         )
-        return dict(updated_record)
+        return thaw_record(frozen)
 
     def delete_record(self, record_type: RecordType, record_id: int) -> dict[str, Any]:
         normalized_id = self._normalize_record_id(record_id)
@@ -173,14 +183,15 @@ class RecordService:
             self._assert_no_related_flights(record_type, normalized_id, related_key)
 
         idx = self._find_index(record_type, normalized_id)
-        deleted = self._records.pop(idx)
+        deleted = self._records[idx]
+        self._records = self._records[:idx] + self._records[idx + 1 :]
 
         LOGGER.info(
             "The record is deleted with recordType: {}, recordId: {}".format(
                 record_type, normalized_id
             )
         )
-        return dict(deleted)
+        return thaw_record(deleted)
 
     def _find_index(self, record_type: RecordType, record_id: int) -> int:
         for index, record in enumerate(self._records):
