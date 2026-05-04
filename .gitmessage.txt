@@ -1,3 +1,12 @@
+Allowed subystems:
+- build
+- record
+- docs
+- tests
+- gui
+- tech-debt
+
+Example:
 record: Summarize the change in present tense.
 
 Why:
