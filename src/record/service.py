@@ -17,7 +17,6 @@ from .error_messages import RecordErrorMessage
 from .exceptions import RecordConflictError, RecordNotFoundError, RecordValidationError
 from .immutability import freeze_record, thaw_record
 from .repository import RecordRepository
-from .storage import JsonRecordRepository
 from .validators import validate_record_payload, validate_stored_record
 
 LOGGER = logging.getLogger(__name__)
@@ -28,11 +27,11 @@ class RecordService:
 
     def __init__(
         self,
-        repository: RecordRepository | None = None,
+        repository: RecordRepository,
         *,
         auto_load: bool = True,
     ) -> None:
-        self._repository = repository or JsonRecordRepository("src/record/record.json")
+        self._repository = repository
         self._records: tuple[Mapping[str, Any], ...] = ()
         self._next_ids: dict[RecordType, int] = {
             record_type: 1 for record_type in ALLOWED_RECORD_TYPES
