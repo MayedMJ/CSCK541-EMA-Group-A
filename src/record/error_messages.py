@@ -83,6 +83,12 @@ class RecordErrorMessage:
             "The record storage is not valid with reason: "
             "item at index {index} must be a dictionary"
         ),
+        "storage_read_failed": (
+            "The record storage cannot be read with path: {path}, reason: {reason}"
+        ),
+        "storage_write_failed": (
+            "The record storage cannot be written with path: {path}, reason: {reason}"
+        ),
     }
 
     @classmethod

@@ -56,7 +56,7 @@ Available methods:
 
 Exception mapping for GUI:
 
-- `RecordValidationError`: invalid payload, id, or relationship reference.
+- `RecordValidationError`: invalid payload, id, relationship reference, or storage read/write failure.
 - `RecordNotFoundError`: requested record does not exist.
 - `RecordConflictError`: delete blocked due to linked flight records.
 
@@ -81,6 +81,7 @@ Exception mapping for GUI:
 - Payloads are strictly validated by record type.
 - Flight records require existing `client_id` and `airline_id`.
 - Storage is JSON-backed through `JsonRecordRepository`.
+- Storage writes are atomic and maintain a `.bak` recovery snapshot.
 
 ## Commit message policy
 
