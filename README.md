@@ -50,15 +50,18 @@ Available methods:
 - Service shutdown: `from main import close_service`.
 - Create: returns created record dict with `id` and `type`.
 - Get: returns one record by `record_type` and `record_id`.
-- List/Search: return collections of records, with case-insensitive string search.
+- List/Search: return collections of records with case-insensitive
+  string search.
 - Update: updates mutable fields and returns the updated record.
 - Delete: deletes one record and returns deleted record payload.
 
 Exception mapping for GUI:
 
-- `RecordValidationError`: invalid payload, id, relationship reference, or storage read/write failure.
+- `RecordValidationError`: invalid payload, id, relationship
+  reference, or storage read/write failure.
 - `RecordNotFoundError`: requested record does not exist.
-- `RecordConflictError`: delete blocked due to linked flight records.
+- `RecordConflictError`: delete blocked due to linked flight
+  records.
 
 ## Record types
 
@@ -88,7 +91,7 @@ Exception mapping for GUI:
 This project follows PyInstaller commit message guidelines:
 
 - Guide: https://pyinstaller.org/en/stable/development/commit-messages.html
-- Example: https://github.com/pyinstaller/pyinstaller/commit/5c1628e66e18e2bb1c44faa88387b1f627181b43
+- Example: https://github.com/pyinstaller/pyinstaller/commit/5c1628e
 
 Format:
 

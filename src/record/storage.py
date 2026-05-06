@@ -59,7 +59,9 @@ class JsonRecordRepository(RecordRepository):
                 )
             ) from exc
 
-        payload = json.dumps(records, ensure_ascii=False, indent=2, sort_keys=True)
+        payload = json.dumps(
+            records, ensure_ascii=False, indent=2, sort_keys=True
+        )
 
         self._write_text_atomically(self._file_path, payload)
         # Keep a valid backup snapshot for recovery scenarios.
@@ -142,7 +144,9 @@ class JsonRecordRepository(RecordRepository):
                 temp_path.unlink()
 
     def _try_restore_primary(self, records: list[dict[str, Any]]) -> None:
-        payload = json.dumps(records, ensure_ascii=False, indent=2, sort_keys=True)
+        payload = json.dumps(
+            records, ensure_ascii=False, indent=2, sort_keys=True
+        )
         try:
             self._write_text_atomically(self._file_path, payload)
         except RecordValidationError:
