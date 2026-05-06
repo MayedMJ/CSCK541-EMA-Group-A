@@ -14,10 +14,10 @@ This repository follows the provided assignment layout:
 │   ├── conf/
 │   │   └── settings.py
 │   ├── data/
+│   │   └── record.json
 │   ├── gui/
 │   ├── main.py
 │   └── record/
-│       └── record.json
 └── tests/
 ```
 
@@ -28,7 +28,7 @@ Use `RecordService` from `record`:
 ```python
 from record import JsonRecordRepository, RecordService
 
-repository = JsonRecordRepository("src/record/record.json")
+repository = JsonRecordRepository("src/data/record.json")
 service = RecordService(repository=repository)
 ```
 
