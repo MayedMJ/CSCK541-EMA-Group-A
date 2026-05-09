@@ -46,6 +46,9 @@ Available methods:
 
 ## GUI-backend contract
 
+Integration guide:
+- `docs/backend-gui-implementation.md`
+
 - Service construction: `from main import build_service`.
 - Service shutdown: `from main import close_service`.
 - Create: returns created record dict with `id` and `type`.
@@ -68,16 +71,6 @@ Exception mapping for GUI:
 - `client`
 - `airline`
 - `flight`
-
-## Role boundaries
-
-- Programmer role:
-- Implements domain contracts, validation, storage, and service behavior.
-- Maintains architecture and code quality (for example, SOLID refactors).
-
-- Tester role:
-- Adds and maintains unit/integration test coverage.
-- Defines and executes edge-case and regression scenarios.
 
 ## Validation and persistence
 
