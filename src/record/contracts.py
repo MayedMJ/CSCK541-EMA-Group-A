@@ -62,15 +62,19 @@ class RecordSchema:
 
 
 def _typed_dict_fields(payload_type: type[Any]) -> tuple[str, ...]:
-    """Extract field order from TypedDict to avoid duplicate schema declarations."""
+    """Extract field order from TypedDict schema definitions."""
     return tuple(payload_type.__annotations__.keys())
 
 
 CLIENT_SCHEMA = RecordSchema(
     required_fields=_typed_dict_fields(ClientPayload),
-    optional_empty_string_fields=frozenset({"address_line_2", "address_line_3"}),
+    optional_empty_string_fields=frozenset(
+        {"address_line_2", "address_line_3"}
+    ),
 )
-AIRLINE_SCHEMA = RecordSchema(required_fields=_typed_dict_fields(AirlinePayload))
+AIRLINE_SCHEMA = RecordSchema(
+    required_fields=_typed_dict_fields(AirlinePayload)
+)
 FLIGHT_SCHEMA = RecordSchema(required_fields=_typed_dict_fields(FlightPayload))
 
 RECORD_SCHEMAS = MappingProxyType(
@@ -108,13 +112,15 @@ def get_record_schema(record_type: RecordType) -> RecordSchema:
     return RECORD_SCHEMAS[record_type]
 
 
-def get_relation_dependencies(record_type: RecordType) -> tuple[RelationDependency, ...]:
+def get_relation_dependencies(
+    record_type: RecordType,
+) -> tuple[RelationDependency, ...]:
     """Return foreign-key dependencies for the provided record type."""
     return RECORD_RELATION_DEPENDENCIES[record_type]
 
 
 def get_flight_reference_field(record_type: RecordType) -> str | None:
-    """Return flight reference field for a parent type, or None if not applicable."""
+    """Return flight reference field for a parent type, if applicable."""
     return FLIGHT_REFERENCE_FIELDS_BY_PARENT_TYPE[record_type]
 
 
