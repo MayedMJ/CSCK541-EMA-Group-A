@@ -1,6 +1,11 @@
+import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
-import customtkinter as ctk
+from record import JsonRecordRepository, RecordService
+
+repository = JsonRecordRepository("src/data/record.json")
+service = RecordService(repository=repository)
+
 
 
 # ---------------------------
@@ -53,8 +58,8 @@ def change_dropdown_value(selected_value, user_option):
     option_types[user_option] = selected_value.get()
 
 
-def create_button(text, row, column, size): 
-    btn = ctk.CTkButton(buttons_frame, text=text, width=size, fg_color = "navy")
+def create_button(text, row, column, size, dictionary): 
+    btn = ctk.CTkButton(buttons_frame, text=text, width=size, fg_color = "navy", command = lambda: create_json(dictionary))
     btn.grid(row=row, column=column, padx=20, pady=10, sticky="ew")
     return btn
 
@@ -67,6 +72,15 @@ def show_success(type, record, action):
 
 def show_error(message): 
     ttk.Text(root, "Something went wrong")
+
+
+# Button Functions
+def create_json(active_dictionary: dict):
+    value_dictionary = {}
+    for label, box in active_dictionary.items():
+        value_dictionary[label] = box[1].get()
+    print(value_dictionary)
+
 
 
 # Panel
@@ -189,10 +203,10 @@ create_dropdown(("Client", "Airline", "Flight Record"), 2, 3, search_value)
 create_title()
 show_dropdown_labels()
 
-create_button("Create Record", 0, 0, 150)
-create_button("Delete Record", 0, 1, 150)
-create_button("Update Record", 0, 2, 150)
-create_button("Search Record", 0, 3, 150)
+create_button("Create Record", 0, 0, 150, create_widgets)
+create_button("Delete Record", 0, 1, 150, delete_widgets)
+create_button("Update Record", 0, 2, 150, update_widgets)
+create_button("Search Record", 0, 3, 150, search_widgets)
 
 # Initial build
 show_panel(create_widgets, create_options_frame, "Client")
@@ -218,7 +232,6 @@ def update_delete():
 def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
-
 
 def update_search():
     change_dropdown_value(search_value, "Search")
