@@ -128,13 +128,17 @@ def prepare_payload(active_dictionary: dict, text):
 def prepare_action_data(text, record_type, store):
     if text == "Create Record":
         service.create_record(record_type, prepare_payload(store, text))
+        service.save()
     elif text == "Delete Record":
         service.delete_record(record_type, prepare_payload(store, text))
+        service.save()
     elif text == "Update Record":
         record_id, updates = prepare_payload(store, text)
         service.update_record(record_type, record_id, updates)
+        service.save()
     else:
         service.get_record(record_type, prepare_payload(store, text))
+        service.save()
     
 
 

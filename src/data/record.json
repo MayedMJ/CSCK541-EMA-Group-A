@@ -1,0 +1,15 @@
+[
+  {
+    "address_line_1": "a",
+    "address_line_2": "a",
+    "address_line_3": "aa",
+    "city": "a",
+    "country": "a",
+    "id": 1,
+    "name": "joey",
+    "phone_number": "07749338370",
+    "state": "a",
+    "type": "client",
+    "zip_code": "a"
+  }
+]
