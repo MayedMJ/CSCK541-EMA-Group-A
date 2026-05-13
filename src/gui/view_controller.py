@@ -1,11 +1,13 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
-from record import JsonRecordRepository, RecordService
+import sys
+print(sys.executable)
+from src.record import JsonRecordRepository, RecordService
+
 
 repository = JsonRecordRepository("src/data/record.json")
 service = RecordService(repository=repository)
-
 
 
 # ---------------------------
@@ -26,6 +28,20 @@ client_box_labels = {
                "City", "State", "Zip Code", "Country", "Phone Number"],
     "Airline": ["ID", "Type", "Company Name"],
     "Flight Record": ["Client_ID", "Airline ID", "Date", "Start City", "End City"]
+}
+
+label_variable_mapping = {
+    "ID": "id",
+    "Type": "type",
+    "Name": "name",
+    "Address Line 1": "address_line_1",
+    "Address Line 2": "address_line_2",
+    "Address Line 3": "address_line_3",
+    "City": "city",
+    "State": "state",
+    "Zip Code": "zip_code",
+    "Country": "country",
+    "Phone Number": "phone_number",
 }
 
 option_types = {
@@ -58,9 +74,22 @@ def change_dropdown_value(selected_value, user_option):
     option_types[user_option] = selected_value.get()
 
 
-def create_button(text, row, column, size, dictionary): 
-    btn = ctk.CTkButton(buttons_frame, text=text, width=size, fg_color = "navy", command = lambda: create_json(dictionary))
+def create_button(text, row, column, size, store, action_key):
+
+    btn = ctk.CTkButton(
+        buttons_frame,
+        text=text,
+        width=size,
+        fg_color="navy",
+        command=lambda: prepare_action_data(
+            text,
+            option_types[action_key].lower(),
+            store
+        )
+    )
+
     btn.grid(row=row, column=column, padx=20, pady=10, sticky="ew")
+
     return btn
 
 def create_textbox(row, column, frame):
@@ -75,11 +104,40 @@ def show_error(message):
 
 
 # Button Functions
-def create_json(active_dictionary: dict):
+def prepare_payload(active_dictionary: dict, text):
     value_dictionary = {}
-    for label, box in active_dictionary.items():
-        value_dictionary[label] = box[1].get()
-    print(value_dictionary)
+    if text == "Create Record":
+        for label, box in active_dictionary.items():
+            key = label_variable_mapping[label]
+            if key != "id" and key != "type":
+                value_dictionary[key] = box[1].get()
+        print(value_dictionary)
+        return value_dictionary
+    elif text == "Delete Record":
+        return int(active_dictionary["ID to Delete"][1].get())
+    elif text == "Update Record":
+        for label, box in active_dictionary.items():
+            key = label_variable_mapping[label]
+            if key not in ("id", "type") and box[1].get():
+                value_dictionary[key] = box[1].get()
+        record_id = int(active_dictionary["ID"][1].get())
+        return record_id, value_dictionary
+    else:
+        return int(active_dictionary["ID to Search"][1].get())
+    
+def prepare_action_data(text, record_type, store):
+    if text == "Create Record":
+        service.create_record(record_type, prepare_payload(store, text))
+    elif text == "Delete Record":
+        service.delete_record(record_type, prepare_payload(store, text))
+    elif text == "Update Record":
+        record_id, updates = prepare_payload(store, text)
+        service.update_record(record_type, record_id, updates)
+    else:
+        service.get_record(record_type, prepare_payload(store, text))
+    
+
+
 
 
 
@@ -203,10 +261,10 @@ create_dropdown(("Client", "Airline", "Flight Record"), 2, 3, search_value)
 create_title()
 show_dropdown_labels()
 
-create_button("Create Record", 0, 0, 150, create_widgets)
-create_button("Delete Record", 0, 1, 150, delete_widgets)
-create_button("Update Record", 0, 2, 150, update_widgets)
-create_button("Search Record", 0, 3, 150, search_widgets)
+create_button("Create Record", 0, 0, 150, create_widgets, "Create")
+create_button("Delete Record", 0, 1, 150, delete_widgets, "Delete")
+create_button("Update Record", 0, 2, 150, update_widgets, "Update")
+create_button("Search Record", 0, 3, 150, search_widgets, "Search")
 
 # Initial build
 show_panel(create_widgets, create_options_frame, "Client")
