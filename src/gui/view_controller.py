@@ -137,7 +137,8 @@ def prepare_action_data(text, record_type, store):
         service.update_record(record_type, record_id, updates)
         service.save()
     else:
-        service.get_record(record_type, prepare_payload(store, text))
+        textbox_info = service.get_record(record_type, prepare_payload(store, text))
+        store["Results"][1].insert("1.0", str(textbox_info))
         service.save()
     
 
