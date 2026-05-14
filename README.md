@@ -2,6 +2,64 @@
 
 Backend service for managing travel-agent records.
 
+## Requirements
+
+- Python 3.10 or newer.
+- No third-party runtime dependencies are required for the backend service.
+- Development tools for testing and linting are listed in `requirements.txt`.
+
+## Setup
+
+Create and activate a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Alternatively, install the project with its development extras:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+## Run the backend
+
+Run the backend entry point:
+
+```bash
+python src/main.py
+```
+
+This initializes the shared `RecordService`, loads records from
+`src/data/record.json`, and closes the service cleanly. The GUI package is
+reserved for the interface layer; backend methods are exposed through
+`main.build_service()` and `main.close_service()`.
+
+## Run tests
+
+Run the full test suite:
+
+```bash
+python -m pytest
+```
+
+Run tests with coverage:
+
+```bash
+python -m pytest --cov=src
+```
+
+## Run linting
+
+Check formatting and lint rules with Ruff:
+
+```bash
+ruff check .
+```
+
 ## Project skeleton
 
 This repository follows the provided assignment layout:

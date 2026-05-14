@@ -11,7 +11,6 @@ import pytest
 from record.contracts import AIRLINE_TYPE, CLIENT_TYPE, FLIGHT_TYPE
 from record.exceptions import RecordValidationError
 from record.validators import validate_record_payload, validate_stored_record
-
 from tests.conftest import airline_payload, client_payload, flight_payload
 
 
@@ -50,7 +49,7 @@ class TestValidateRecordPayload:
     @pytest.mark.parametrize("field", ["name", "address_line_1", "city"])
     def test_client_missing_required_field(self, field: str) -> None:
         """Omitting a required client field raises RecordValidationError."""
-        # Currently all client type fields are required (address_line_2 and address_line_3 can be empty strings)
+        # All client fields are required, but some may be empty strings.
         payload = client_payload()
         del payload[field]
         with pytest.raises(RecordValidationError):
@@ -72,7 +71,7 @@ class TestValidateRecordPayload:
         del p[field]
         with pytest.raises(RecordValidationError):
             validate_record_payload(FLIGHT_TYPE, p)
-    
+
     # Generic error handling cases
     def test_unknown_field_rejected(self) -> None:
         """Extra fields not in the schema are rejected."""
@@ -92,7 +91,7 @@ class TestValidateRecordPayload:
             validate_record_payload("unknown", {})  # type: ignore[arg-type]
 
     def test_type_field_mismatch(self) -> None:
-        """Payload with a type field that disagrees with record_type is rejected."""
+        """Payload type must match record_type."""
         p = client_payload(type="airline")  # type: ignore[misc]
         with pytest.raises(RecordValidationError):
             validate_record_payload(CLIENT_TYPE, p)
@@ -112,7 +111,9 @@ class TestValidateRecordPayload:
         [True, 1.5, 0, -1],
         ids=["bool", "float", "zero", "negative"],
     )
-    def test_invalid_client_id_field_flight(self, bad_client_id: object) -> None:
+    def test_invalid_client_id_field_flight(
+        self, bad_client_id: object
+    ) -> None:
         """Invalid client_id values for flights are rejected."""
         with pytest.raises(RecordValidationError):
             validate_record_payload(
@@ -125,7 +126,9 @@ class TestValidateRecordPayload:
         [True, 1.5, 0, -1],
         ids=["bool", "float", "zero", "negative"],
     )
-    def test_invalid_airline_id_field_flight(self, bad_airline_id: object) -> None:
+    def test_invalid_airline_id_field_flight(
+        self, bad_airline_id: object
+    ) -> None:
         """Invalid airline_id values for flights are rejected."""
         with pytest.raises(RecordValidationError):
             validate_record_payload(
@@ -228,4 +231,3 @@ class TestValidateStoredRecord:
         """Non-dict input is rejected."""
         with pytest.raises(RecordValidationError):
             validate_stored_record([])  # type: ignore[arg-type]
-

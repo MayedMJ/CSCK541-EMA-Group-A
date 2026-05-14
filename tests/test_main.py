@@ -94,5 +94,5 @@ def test_second_build_after_close_new_instance(
     main.close_service()
     monkeypatch.setattr(main, "RECORD_FILE_PATH", tmp_path / "b.json")
     second = main.build_service()
-    # Asserting that the two instances are different as the second instance was created after the first instance was closed
+    # The second instance is created after the first instance is closed.
     assert first is not second

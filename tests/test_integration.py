@@ -1,7 +1,6 @@
 """Integration tests across service, validators, and JSON repository.
 
-Validates that the full stack (RecordService + JsonRecordRepository + validators)
-works end-to-end with real file I/O.
+Validates that the full backend stack works end-to-end with real file I/O.
 """
 
 from __future__ import annotations
@@ -11,15 +10,14 @@ from pathlib import Path
 from record.contracts import AIRLINE_TYPE, CLIENT_TYPE, FLIGHT_TYPE
 from record.service import RecordService
 from record.storage import JsonRecordRepository
-
 from tests.conftest import airline_payload, client_payload, flight_payload
 
 
 def test_create_save_reload_round_trip(tmp_path: Path) -> None:
     """Records created, saved, and loaded by a new instance are identical.
 
-    Flights require two foreign keys (client_id, airline_id); parents must exist
-    before create. We assert the reloaded flight still references those ids.
+    Flights require two foreign keys. Parents must exist before create.
+    We assert the reloaded flight still references those ids.
     """
     path = tmp_path / "records.json"
     repo1 = JsonRecordRepository(path)

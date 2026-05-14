@@ -135,7 +135,7 @@ def test_all_templates_format(
 ) -> None:
     """Each registered template formats with the expected kwargs and text."""
     msg = RecordErrorMessage.from_(key, **kwargs)
-    # Asserting that the message is a non-empty string and includes all the expected fragments
+    # Asserts that the message is non-empty and includes expected fragments.
     assert isinstance(msg, str)
     assert msg.strip()
     for fragment in must_contain:
@@ -143,8 +143,8 @@ def test_all_templates_format(
 
 
 def test_format_cases_cover_all_templates() -> None:
-    """Every key in RecordErrorMessage._TEMPLATES has a row in _TEMPLATE_FORMAT_CASES."""
-    # Asserts that every record error message aligns with the template format cases keys
+    """Every template key has a matching format case."""
+    # Asserts that message templates align with format case keys.
     registered = frozenset(RecordErrorMessage._TEMPLATES)
     covered = frozenset(key for key, _, _ in _TEMPLATE_FORMAT_CASES)
     assert covered == registered

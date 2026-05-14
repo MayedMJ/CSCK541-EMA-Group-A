@@ -13,7 +13,6 @@ import pytest
 
 from record.exceptions import RecordValidationError
 from record.storage import JsonRecordRepository
-
 from tests.conftest import client_payload
 
 
@@ -47,8 +46,10 @@ def test_load_missing_file_returns_empty(tmp_json_path: Path) -> None:
     ],
     ids=["invalid_json", "root_not_list", "item_not_dict"],
 )
-def test_load_invalid_payload_raises(tmp_json_path: Path, file_text: str) -> None:
-    """Invalid on-disk JSON (syntax, root type, item types) raises RecordValidationError."""
+def test_load_invalid_payload_raises(
+    tmp_json_path: Path, file_text: str
+) -> None:
+    """Invalid on-disk JSON raises RecordValidationError."""
     tmp_json_path.write_text(file_text, encoding="utf-8")
     repo = JsonRecordRepository(tmp_json_path)
     with pytest.raises(RecordValidationError):

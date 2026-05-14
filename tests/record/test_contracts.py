@@ -9,9 +9,9 @@ from __future__ import annotations
 from record.contracts import (
     AIRLINE_TYPE,
     ALLOWED_RECORD_TYPES,
+    CLIENT_SCHEMA,
     CLIENT_TYPE,
     FLIGHT_TYPE,
-    CLIENT_SCHEMA,
     get_flight_reference_field,
     get_record_schema,
     get_relation_dependencies,

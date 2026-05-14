@@ -9,9 +9,12 @@ from __future__ import annotations
 import pytest
 
 from record.contracts import AIRLINE_TYPE, CLIENT_TYPE, FLIGHT_TYPE
-from record.exceptions import RecordConflictError, RecordNotFoundError, RecordValidationError
+from record.exceptions import (
+    RecordConflictError,
+    RecordNotFoundError,
+    RecordValidationError,
+)
 from record.service import RecordService
-
 from tests.conftest import (
     FakeRepository,
     airline_payload,
@@ -29,7 +32,9 @@ def empty_service(fake_repo: FakeRepository) -> RecordService:
 class TestCreateRecord:
     """Tests for RecordService.create_record."""
 
-    def test_assigns_id_and_type_client(self, empty_service: RecordService) -> None:
+    def test_assigns_id_and_type_client(
+        self, empty_service: RecordService
+    ) -> None:
         """First created client record gets id=1 and type='client'."""
         out = empty_service.create_record(CLIENT_TYPE, client_payload())
         assert out["id"] == 1
@@ -57,12 +62,14 @@ class TestCreateRecord:
         assert a["id"] == 1
 
     def test_invalid_type_raises(self, empty_service: RecordService) -> None:
-        """Creating a record with an unknown type raises RecordValidationError."""
+        """Creating with an unknown type raises RecordValidationError."""
         with pytest.raises(RecordValidationError):
             empty_service.create_record("unknown", {})  # type: ignore[arg-type]
 
-    def test_non_dict_payload_raises(self, empty_service: RecordService) -> None:
-        """Creating a record with a non-dict payload raises RecordValidationError."""
+    def test_non_dict_payload_raises(
+        self, empty_service: RecordService
+    ) -> None:
+        """Creating with a non-dict payload raises RecordValidationError."""
         with pytest.raises(RecordValidationError):
             empty_service.create_record(CLIENT_TYPE, "bad")  # type: ignore[arg-type]
 
@@ -70,7 +77,9 @@ class TestCreateRecord:
 class TestGetRecord:
     """Tests for RecordService.get_record."""
 
-    def test_retrieves_by_type_and_id(self, empty_service: RecordService) -> None:
+    def test_retrieves_by_type_and_id(
+        self, empty_service: RecordService
+    ) -> None:
         """A created record can be retrieved by its type and id."""
         created = empty_service.create_record(CLIENT_TYPE, client_payload())
         got = empty_service.get_record(CLIENT_TYPE, created["id"])
@@ -92,12 +101,16 @@ class TestGetRecord:
         ["abc", True, 0, -5],
         ids=["non_digit_string", "boolean", "zero", "negative"],
     )
-    def test_invalid_id_raises(self, empty_service: RecordService, bad_id: object) -> None:
+    def test_invalid_id_raises(
+        self, empty_service: RecordService, bad_id: object
+    ) -> None:
         """Non-positive-integer IDs raise RecordValidationError."""
         with pytest.raises(RecordValidationError):
             empty_service.get_record(CLIENT_TYPE, bad_id)  # type: ignore[arg-type]
 
-    def test_whitespace_padded_string_id(self, empty_service: RecordService) -> None:
+    def test_whitespace_padded_string_id(
+        self, empty_service: RecordService
+    ) -> None:
         """Whitespace around a digit string is stripped before lookup."""
         created = empty_service.create_record(CLIENT_TYPE, client_payload())
         got = empty_service.get_record(CLIENT_TYPE, " 1 ")  # type: ignore[arg-type]
@@ -129,7 +142,7 @@ class TestUpdateRecord:
             )
 
     def test_rejects_type_change(self, empty_service: RecordService) -> None:
-        """Attempting to change the record type raises RecordValidationError."""
+        """Changing the record type raises RecordValidationError."""
         created = empty_service.create_record(CLIENT_TYPE, client_payload())
         with pytest.raises(RecordValidationError):
             empty_service.update_record(
@@ -138,7 +151,9 @@ class TestUpdateRecord:
                 {"type": "airline"},
             )
 
-    def test_non_dict_updates_raises(self, empty_service: RecordService) -> None:
+    def test_non_dict_updates_raises(
+        self, empty_service: RecordService
+    ) -> None:
         """Passing non-dict updates raises RecordValidationError."""
         created = empty_service.create_record(CLIENT_TYPE, client_payload())
         with pytest.raises(RecordValidationError):
@@ -148,8 +163,10 @@ class TestUpdateRecord:
                 "not a dict",  # type: ignore[arg-type]
             )
 
-    def test_update_flight_happy_path(self, empty_service: RecordService) -> None:
-        """Updating a flight record merges new values and re-validates relations."""
+    def test_update_flight_happy_path(
+        self, empty_service: RecordService
+    ) -> None:
+        """Updating a flight merges new values and validates relations."""
         c = empty_service.create_record(CLIENT_TYPE, client_payload())
         a = empty_service.create_record(AIRLINE_TYPE, airline_payload())
         f = empty_service.create_record(
@@ -165,7 +182,7 @@ class TestUpdateRecord:
     def test_update_flight_invalid_relation_raises(
         self, empty_service: RecordService
     ) -> None:
-        """Updating a flight's FK to a non-existent parent raises RecordValidationError."""
+        """Updating a flight to a missing parent raises validation."""
         c = empty_service.create_record(CLIENT_TYPE, client_payload())
         a = empty_service.create_record(AIRLINE_TYPE, airline_payload())
         f = empty_service.create_record(
@@ -220,7 +237,9 @@ class TestListAndSearch:
         assert len(clients) == 1
         assert clients[0]["type"] == CLIENT_TYPE
 
-    def test_search_case_insensitive_strings(self, empty_service: RecordService) -> None:
+    def test_search_case_insensitive_strings(
+        self, empty_service: RecordService
+    ) -> None:
         """String filter values match case-insensitively."""
         empty_service.create_record(CLIENT_TYPE, client_payload())
         hits = empty_service.search_records(name="ADA LOVELACE")
@@ -242,7 +261,9 @@ class TestListAndSearch:
         empty_service.create_record(CLIENT_TYPE, client_payload())
         assert empty_service.search_records(name="Nobody") == []
 
-    def test_search_filter_key_not_in_record(self, empty_service: RecordService) -> None:
+    def test_search_filter_key_not_in_record(
+        self, empty_service: RecordService
+    ) -> None:
         """Filtering on a key absent from the record yields no matches."""
         empty_service.create_record(CLIENT_TYPE, client_payload())
         assert empty_service.search_records(nonexistent_field="x") == []
@@ -272,7 +293,7 @@ class TestRelationConstraints:
     def test_delete_client_blocked_when_flights_exist(
         self, empty_service: RecordService
     ) -> None:
-        """Deleting a client that has linked flights raises RecordConflictError."""
+        """Deleting a client with linked flights raises conflict."""
         c = empty_service.create_record(CLIENT_TYPE, client_payload())
         a = empty_service.create_record(AIRLINE_TYPE, airline_payload())
         empty_service.create_record(
@@ -285,7 +306,7 @@ class TestRelationConstraints:
     def test_delete_airline_blocked_when_flights_exist(
         self, empty_service: RecordService
     ) -> None:
-        """Deleting an airline that has linked flights raises RecordConflictError."""
+        """Deleting an airline with linked flights raises conflict."""
         c = empty_service.create_record(CLIENT_TYPE, client_payload())
         a = empty_service.create_record(AIRLINE_TYPE, airline_payload())
         empty_service.create_record(
@@ -344,7 +365,9 @@ class TestLoadSave:
 class TestIdSequencingAfterReload:
     """Tests for correct ID continuation across save/reload cycles."""
 
-    def test_next_id_continues_after_reload(self, fake_repo: FakeRepository) -> None:
+    def test_next_id_continues_after_reload(
+        self, fake_repo: FakeRepository
+    ) -> None:
         """A new service instance resumes IDs from the highest stored value."""
         s1 = RecordService(repository=fake_repo, auto_load=True)
         s1.create_record(CLIENT_TYPE, client_payload())
