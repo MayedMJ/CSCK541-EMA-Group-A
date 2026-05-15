@@ -21,6 +21,9 @@ root.title(title)
 root.geometry("1200x660")
 root.resizable(False, False)
 
+buttons_frame = ttk.Frame(root)
+buttons_frame.grid(row=2, column=0, columnspan=4, sticky="ew")
+
 user_options = ("Create", "Delete", "Update", "Search")
 
 client_box_labels = {
@@ -96,15 +99,20 @@ def create_textbox(row, column, frame):
     tb = ctk.CTkTextbox(frame, row=row, column=column)
     return tb
 
-def show_success(type, record, action): 
-    ttk.Text(root, f"Success! The {type} record {record} has been {action}.") 
 
-def show_error(message): 
-    ttk.Text(root, "Something went wrong")
 
+message_label = ctk.CTkLabel(
+    buttons_frame,
+    text="",
+    font=("Arial", 20),
+    text_color="green"
+)
+
+message_label.grid(row=0, column=0, columnspan=4, pady=5)
 
 # Button Functions
 def prepare_payload(active_dictionary: dict, text):
+
     value_dictionary = {}
     if text == "Create Record":
         for label, box in active_dictionary.items():
@@ -126,24 +134,58 @@ def prepare_payload(active_dictionary: dict, text):
         return int(active_dictionary["ID to Search"][1].get())
     
 def prepare_action_data(text, record_type, store):
-    if text == "Create Record":
-        service.create_record(record_type, prepare_payload(store, text))
-        service.save()
-    elif text == "Delete Record":
-        service.delete_record(record_type, prepare_payload(store, text))
-        service.save()
-    elif text == "Update Record":
-        record_id, updates = prepare_payload(store, text)
-        service.update_record(record_type, record_id, updates)
-        service.save()
-    else:
-        textbox_info = service.get_record(record_type, prepare_payload(store, text))
-        store["Results"][1].insert("1.0", str(textbox_info))
-        service.save()
-    
 
+    try:
 
+        if text == "Create Record":
+            service.create_record(record_type, prepare_payload(store, text))
+            service.save()
 
+            message_label.configure(
+                text="Record created successfully!",
+                text_color="green"
+            )
+
+        elif text == "Delete Record":
+            service.delete_record(record_type, prepare_payload(store, text))
+            service.save()
+
+            message_label.configure(
+                text="Record deleted successfully!",
+                text_color="green"
+            )
+
+        elif text == "Update Record":
+            record_id, updates = prepare_payload(store, text)
+
+            service.update_record(record_type, record_id, updates)
+            service.save()
+
+            message_label.configure(
+                text="Record updated successfully!",
+                text_color="green"
+            )
+
+        else:
+            textbox_info = service.get_record(
+                record_type,
+                prepare_payload(store, text)
+            )
+
+            store["Results"][1].delete("1.0", "end")
+            store["Results"][1].insert("1.0", str(textbox_info))
+
+            message_label.configure(
+                text="Search completed successfully!",
+                text_color="green"
+            )
+
+    except Exception as e:
+
+        message_label.configure(
+            text=f"Error: {e}",
+            text_color="red"
+        )
 
 
 # Panel
@@ -210,7 +252,6 @@ def show_dropdown_labels():
 
 
 
-
 # Equal 4-column layout
 
 for i in range(4):
@@ -236,8 +277,7 @@ search_options_frame.grid(row=1, column=3, sticky="nsew")
 
 
 
-buttons_frame = ttk.Frame(root)
-buttons_frame.grid(row=2, column=0, columnspan=4, sticky="ew")
+
 
 for i in range(4):
     buttons_frame.grid_columnconfigure(i, weight=1)
@@ -266,10 +306,10 @@ create_dropdown(("Client", "Airline", "Flight Record"), 2, 3, search_value)
 create_title()
 show_dropdown_labels()
 
-create_button("Create Record", 0, 0, 150, create_widgets, "Create")
-create_button("Delete Record", 0, 1, 150, delete_widgets, "Delete")
-create_button("Update Record", 0, 2, 150, update_widgets, "Update")
-create_button("Search Record", 0, 3, 150, search_widgets, "Search")
+create_button("Create Record", 1, 0, 150, create_widgets, "Create")
+create_button("Delete Record", 1, 1, 150, delete_widgets, "Delete")
+create_button("Update Record", 1, 2, 150, update_widgets, "Update")
+create_button("Search Record", 1, 3, 150, search_widgets, "Search")
 
 # Initial build
 show_panel(create_widgets, create_options_frame, "Client")
