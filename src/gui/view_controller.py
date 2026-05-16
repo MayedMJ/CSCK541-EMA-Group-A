@@ -19,7 +19,7 @@ service = RecordService(repository=repository)
 title = "Airline Records Management System"
 root = tk.Tk()
 root.title(title)
-root.geometry("1200x560")
+root.geometry("1200x600")
 root.resizable(False, True)
 
 buttons_frame = ttk.Frame(root)
@@ -376,7 +376,7 @@ def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
     if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
-        root.minsize(1200, 640)
+        root.minsize(1200, 600)
     else:
         root.minsize(1200, 450)
 
@@ -390,7 +390,7 @@ def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
     if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
-        root.minsize(1200, 640)
+        root.minsize(1200, 600)
     else:
         root.minsize(1200, 450)
 
