@@ -11,5 +11,23 @@
     "state": "r",
     "type": "client",
     "zip_code": "r"
+  },
+  {
+    "address_line_1": "ff",
+    "address_line_2": "f",
+    "address_line_3": "f",
+    "city": "5",
+    "country": "f",
+    "id": 2,
+    "name": "f",
+    "phone_number": "40",
+    "state": "f",
+    "type": "client",
+    "zip_code": "f"
+  },
+  {
+    "company_name": "company",
+    "id": 1,
+    "type": "airline"
   }
 ]

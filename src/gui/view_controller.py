@@ -63,6 +63,10 @@ label_variable_mapping = {
     "Zip Code": "zip_code",
     "Country": "country",
     "Phone Number": "phone_number",
+    "Company Name": "company_name",
+    "Date": "date",
+    "Start City": "start_city",
+    "End City": "end_city",
 }
 
 variable_label_mapping = {v: k for k, v in label_variable_mapping.items()}
@@ -243,7 +247,7 @@ def build_panel(frame, record_type, store):
     store.clear()
 
     if frame in (create_options_frame, update_options_frame):
-        for i, label in enumerate(client_box_labels[record_type][2:]):
+        for i, label in enumerate(client_box_labels[record_type][2:] if frame == create_options_frame else [label for label in client_box_labels[record_type] if label != "Type"]):
             lbl = ctk.CTkLabel(frame, text=label, font=("Arial", 12))
             ent = ctk.CTkEntry(frame, width=150)
 
@@ -340,10 +344,10 @@ update_value = create_dropdown_value()
 search_value = create_dropdown_value()
 
 
-create_dropdown(("Client", "Airline", "Flight Record"), 2, 0, create_value)
-create_dropdown(("Client", "Airline", "Flight Record"), 2, 1, delete_value)
-create_dropdown(("Client", "Airline", "Flight Record"), 2, 2, update_value)
-create_dropdown(("Client", "Airline", "Flight Record"), 2, 3, search_value)
+create_dropdown(("Client", "Airline", "Flight"), 2, 0, create_value)
+create_dropdown(("Client", "Airline", "Flight"), 2, 1, delete_value)
+create_dropdown(("Client", "Airline", "Flight"), 2, 2, update_value)
+create_dropdown(("Client", "Airline", "Flight"), 2, 3, search_value)
 
 
 # Static UI
@@ -372,7 +376,7 @@ def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
     if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
-        root.minsize(1200, 560)
+        root.minsize(1200, 640)
     else:
         root.minsize(1200, 450)
 
@@ -386,7 +390,7 @@ def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
     if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
-        root.minsize(1200, 560)
+        root.minsize(1200, 640)
     else:
         root.minsize(1200, 450)
 
