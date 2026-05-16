@@ -1,11 +1,12 @@
-from src.record import JsonRecordRepository, RecordService
+from record import (JsonRecordRepository, RecordService, RecordConflictError, RecordNotFoundError, RecordValidationError)
+from main import build_service, close_service
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
 import sys
 print(sys.executable)
 
-
+service = build_service()
 repository = JsonRecordRepository("src/data/record.json")
 service = RecordService(repository=repository)
 
@@ -43,7 +44,7 @@ client_box_labels = {
         "ID",
         "Type",
         "Company Name"],
-    "Flight Record": [
+    "Flight": [
         "Client_ID",
         "Airline ID",
         "Date",
@@ -208,10 +209,22 @@ def prepare_action_data(text, record_type, store):
                 text_color="green"
             )
 
-    except Exception as e:
+    except RecordValidationError as e:
 
         message_label.configure(
-            text=f"Error: {e}",
+            text=f"Validation Error: {e}",
+            text_color="red"
+        )
+    except RecordConflictError as e:
+
+        message_label.configure(
+            text=f"Conflict Error: {e}",
+            text_color="red"
+        )
+    except RecordNotFoundError as e:
+
+        message_label.configure(
+            text=f"Not Found Error: {e}",
             text_color="red"
         )
 
@@ -379,6 +392,13 @@ create_value.trace_add("write", lambda *args: update_create())
 delete_value.trace_add("write", lambda *args: update_delete())
 update_value.trace_add("write", lambda *args: update_update())
 search_value.trace_add("write", lambda *args: update_search())
+
+def on_close():
+    close_service()
+    root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", on_close)
+
 
 # Run
 root.mainloop()

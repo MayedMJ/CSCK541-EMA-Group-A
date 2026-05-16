@@ -1,0 +1,15 @@
+[
+  {
+    "address_line_1": "r",
+    "address_line_2": "r",
+    "address_line_3": "r",
+    "city": "r",
+    "country": "r",
+    "id": 1,
+    "name": "testname",
+    "phone_number": "56",
+    "state": "r",
+    "type": "client",
+    "zip_code": "r"
+  }
+]
