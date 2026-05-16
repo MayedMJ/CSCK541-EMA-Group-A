@@ -18,8 +18,8 @@ service = RecordService(repository=repository)
 title = "Airline Records Management System"
 root = tk.Tk()
 root.title(title)
-root.geometry("1200x660")
-root.resizable(False, False)
+root.geometry("1200x560")
+root.resizable(False, True)
 
 buttons_frame = ttk.Frame(root)
 buttons_frame.grid(row=2, column=0, columnspan=4, sticky="ew")
@@ -201,7 +201,7 @@ def build_panel(frame, record_type, store):
     store.clear()
 
     if frame in (create_options_frame, update_options_frame):
-        for i, label in enumerate(client_box_labels[record_type]):
+        for i, label in enumerate(client_box_labels[record_type][2:]):
             lbl = ctk.CTkLabel(frame, text=label, font=("Arial", 12))
             ent = ctk.CTkEntry(frame, width=150)
 
@@ -223,7 +223,7 @@ def build_panel(frame, record_type, store):
         store["ID to Search"] = (lbl, ent)
 
         lbl = ctk.CTkLabel(frame, text="Results", font=("Arial", 12))
-        ent = ctk.CTkTextbox(frame, width = 100, height = 300, wrap = "word", border_width = 1, border_color = "black")
+        ent = ctk.CTkTextbox(frame, width = 100, height = 200, wrap = "word", border_width = 1, border_color = "black")
         lbl.grid(row=1, column=0, padx=10, pady=5, sticky="w")
         ent.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
         store["Results"] = (lbl, ent)
