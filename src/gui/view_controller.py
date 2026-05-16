@@ -47,6 +47,8 @@ label_variable_mapping = {
     "Phone Number": "phone_number",
 }
 
+variable_label_mapping = {v: k for k, v in label_variable_mapping.items()}
+
 option_types = {
     "Create": "Client",
     "Delete": "Client",
@@ -171,10 +173,10 @@ def prepare_action_data(text, record_type, store):
                 record_type,
                 prepare_payload(store, text)
             )
-
             store["Results"][1].delete("1.0", "end")
-            store["Results"][1].insert("1.0", str(textbox_info))
-
+            for key, value in textbox_info.items():
+                if key != "type" and key != "id":
+                    store["Results"][1].insert("end", str(f"{variable_label_mapping[key]}: {value}\n"))
             message_label.configure(
                 text="Search completed successfully!",
                 text_color="green"
