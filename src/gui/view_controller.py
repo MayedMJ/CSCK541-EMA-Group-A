@@ -135,8 +135,9 @@ message_label = ctk.CTkLabel(
 
 message_label.grid(row=0, column=0, columnspan=4, pady=5)
 
-# Button Functions
 
+
+# Button Functions
 
 def prepare_payload(active_dictionary: dict, text):
 
@@ -267,7 +268,7 @@ def build_panel(frame, record_type, store):
         ent = ctk.CTkTextbox(
             frame,
             width=100,
-            height=200,
+            height=180,
             wrap="word",
             border_width=1,
             border_color="black")
@@ -370,6 +371,10 @@ show_panel(search_widgets, search_options_frame, "Client")
 def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
+    if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
+        root.minsize(1200, 560)
+    else:
+        root.minsize(1200, 450)
 
 
 def update_delete():
@@ -380,6 +385,11 @@ def update_delete():
 def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
+    if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
+        root.minsize(1200, 560)
+    else:
+        root.minsize(1200, 450)
+
 
 
 def update_search():
