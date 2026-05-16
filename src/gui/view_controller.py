@@ -1,9 +1,9 @@
+from src.record import JsonRecordRepository, RecordService
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
 import sys
 print(sys.executable)
-from src.record import JsonRecordRepository, RecordService
 
 
 repository = JsonRecordRepository("src/data/record.json")
@@ -27,11 +27,28 @@ buttons_frame.grid(row=2, column=0, columnspan=4, sticky="ew")
 user_options = ("Create", "Delete", "Update", "Search")
 
 client_box_labels = {
-    "Client": ["ID", "Type", "Name", "Address Line 1", "Address Line 2", "Address Line 3",
-               "City", "State", "Zip Code", "Country", "Phone Number"],
-    "Airline": ["ID", "Type", "Company Name"],
-    "Flight Record": ["Client_ID", "Airline ID", "Date", "Start City", "End City"]
-}
+    "Client": [
+        "ID",
+        "Type",
+        "Name",
+        "Address Line 1",
+        "Address Line 2",
+        "Address Line 3",
+        "City",
+        "State",
+        "Zip Code",
+        "Country",
+        "Phone Number"],
+    "Airline": [
+        "ID",
+        "Type",
+        "Company Name"],
+    "Flight Record": [
+        "Client_ID",
+        "Airline ID",
+        "Date",
+        "Start City",
+        "End City"]}
 
 label_variable_mapping = {
     "ID": "id",
@@ -70,7 +87,12 @@ def create_dropdown_value():
 
 
 def create_dropdown(options, row, column, selected_value):
-    cb = ttk.Combobox(upper_frame, textvariable=selected_value, values=options, state="readonly", width = 16)
+    cb = ttk.Combobox(
+        upper_frame,
+        textvariable=selected_value,
+        values=options,
+        state="readonly",
+        width=16)
     cb.grid(row=row, column=column, padx=92, pady=10, sticky="nsew")
     return cb
 
@@ -97,10 +119,10 @@ def create_button(text, row, column, size, store, action_key):
 
     return btn
 
+
 def create_textbox(row, column, frame):
     tb = ctk.CTkTextbox(frame, row=row, column=column)
     return tb
-
 
 
 message_label = ctk.CTkLabel(
@@ -113,6 +135,8 @@ message_label = ctk.CTkLabel(
 message_label.grid(row=0, column=0, columnspan=4, pady=5)
 
 # Button Functions
+
+
 def prepare_payload(active_dictionary: dict, text):
 
     value_dictionary = {}
@@ -134,7 +158,8 @@ def prepare_payload(active_dictionary: dict, text):
         return record_id, value_dictionary
     else:
         return int(active_dictionary["ID to Search"][1].get())
-    
+
+
 def prepare_action_data(text, record_type, store):
 
     try:
@@ -176,7 +201,8 @@ def prepare_action_data(text, record_type, store):
             store["Results"][1].delete("1.0", "end")
             for key, value in textbox_info.items():
                 if key != "type" and key != "id":
-                    store["Results"][1].insert("end", str(f"{variable_label_mapping[key]}: {value}\n"))
+                    store["Results"][1].insert("end", str(
+                        f"{variable_label_mapping[key]}: {value}\n"))
             message_label.configure(
                 text="Search completed successfully!",
                 text_color="green"
@@ -225,7 +251,13 @@ def build_panel(frame, record_type, store):
         store["ID to Search"] = (lbl, ent)
 
         lbl = ctk.CTkLabel(frame, text="Results", font=("Arial", 12))
-        ent = ctk.CTkTextbox(frame, width = 100, height = 200, wrap = "word", border_width = 1, border_color = "black")
+        ent = ctk.CTkTextbox(
+            frame,
+            width=100,
+            height=200,
+            wrap="word",
+            border_width=1,
+            border_color="black")
         lbl.grid(row=1, column=0, padx=10, pady=5, sticky="w")
         ent.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
         store["Results"] = (lbl, ent)
@@ -251,11 +283,7 @@ def show_dropdown_labels():
         )
 
 
-
-
-
 # Equal 4-column layout
-
 for i in range(4):
     root.grid_columnconfigure(i, weight=1, uniform="cols")
 
@@ -278,14 +306,15 @@ update_options_frame.grid(row=1, column=2, sticky="nsew")
 search_options_frame.grid(row=1, column=3, sticky="nsew")
 
 
-
-
-
 for i in range(4):
     buttons_frame.grid_columnconfigure(i, weight=1)
 
 
-for frame in [create_options_frame, delete_options_frame, update_options_frame, search_options_frame]:
+for frame in [
+        create_options_frame,
+        delete_options_frame,
+        update_options_frame,
+        search_options_frame]:
     frame.grid_columnconfigure(1, weight=1)
 
 
@@ -295,7 +324,6 @@ create_value = create_dropdown_value()
 delete_value = create_dropdown_value()
 update_value = create_dropdown_value()
 search_value = create_dropdown_value()
-
 
 
 create_dropdown(("Client", "Airline", "Flight Record"), 2, 0, create_value)
@@ -324,6 +352,8 @@ show_panel(search_widgets, search_options_frame, "Client")
 # ---------------------------
 
 # Dropdown handlers
+
+
 def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
@@ -337,6 +367,7 @@ def update_delete():
 def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
+
 
 def update_search():
     change_dropdown_value(search_value, "Search")
