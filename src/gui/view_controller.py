@@ -43,7 +43,7 @@ client_box_labels = {
         "Type",
         "Company Name"],
     "Flight": [
-        "Client_ID",
+        "Client ID",
         "Airline ID",
         "Date",
         "Start City",
@@ -65,6 +65,8 @@ label_variable_mapping = {
     "Date": "date",
     "Start City": "start_city",
     "End City": "end_city",
+    "Client ID": "client_id",
+    "Airline ID": "airline_id"
 }
 
 variable_label_mapping = {v: k for k, v in label_variable_mapping.items()}
@@ -245,7 +247,7 @@ def build_panel(frame, record_type, store):
     store.clear()
 
     if frame in (create_options_frame, update_options_frame):
-        for i, label in enumerate(client_box_labels[record_type][2:] if frame == create_options_frame else [label for label in client_box_labels[record_type] if label != "Type"]):
+        for i, label in enumerate(client_box_labels[record_type][2:] if (frame == create_options_frame and record_type != "Flight")  else [label for label in client_box_labels[record_type] if label != "Type"]):
             lbl = ctk.CTkLabel(frame, text=label, font=("Arial", 12))
             ent = ctk.CTkEntry(frame, width=150)
 

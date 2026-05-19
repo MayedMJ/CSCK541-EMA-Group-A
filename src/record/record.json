@@ -3,5 +3,27 @@
     "company_name": "hello",
     "id": 1,
     "type": "airline"
+  },
+  {
+    "address_line_1": "a",
+    "address_line_2": "a",
+    "address_line_3": "a",
+    "city": "a",
+    "country": "a",
+    "id": 1,
+    "name": "a",
+    "phone_number": "3",
+    "state": "a",
+    "type": "client",
+    "zip_code": "a"
+  },
+  {
+    "airline_id": 1,
+    "client_id": 1,
+    "date": "2026-05-19T00:00:00",
+    "end_city": "a",
+    "id": 1,
+    "start_city": "a",
+    "type": "flight"
   }
 ]
