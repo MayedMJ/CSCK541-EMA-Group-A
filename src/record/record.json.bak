@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "company_name": "hello",
+    "id": 1,
+    "type": "airline"
+  }
+]

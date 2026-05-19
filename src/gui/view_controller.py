@@ -7,8 +7,6 @@ import sys
 print(sys.executable)
 
 service = build_service()
-repository = JsonRecordRepository("src/data/record.json")
-service = RecordService(repository=repository)
 
 
 # ---------------------------
@@ -154,16 +152,16 @@ def prepare_payload(active_dictionary: dict, text):
         print(value_dictionary)
         return value_dictionary
     elif text == "Delete Record":
-        return int(active_dictionary["ID to Delete"][1].get())
+        return active_dictionary["ID to Delete"][1].get()
     elif text == "Update Record":
         for label, box in active_dictionary.items():
             key = label_variable_mapping[label]
             if key not in ("id", "type") and box[1].get():
                 value_dictionary[key] = box[1].get()
-        record_id = int(active_dictionary["ID"][1].get())
+        record_id = active_dictionary["ID"][1].get()
         return record_id, value_dictionary
     else:
-        return int(active_dictionary["ID to Search"][1].get())
+        return active_dictionary["ID to Search"][1].get()
 
 
 def prepare_action_data(text, record_type, store):
