@@ -22,6 +22,8 @@ sys.modules["tkinter.ttk"] = MagicMock()
 sys.modules["customtkinter"] = MagicMock()
 sys.modules["src"] = MagicMock()
 sys.modules["src.record"] = MagicMock()
+sys.modules["record"] = MagicMock()
+sys.modules["main"] = MagicMock()
 
 # Load view_controller directly from its file path since it cannot be imported normally.
 _vc_path = os.path.join(
@@ -147,6 +149,56 @@ class TestPreparePayloadSearch:
         store = {"ID to Search": _widget_pair("99")}
         result = view_controller.prepare_payload(store, "Search Record")
         assert result == 99
+
+
+
+# Flight Create panel regression
+
+
+class TestFlightCreatePanelHasForeignKeys:
+    """Regression test for the Flight Create panel.
+
+    The Flight schema requires client_id and airline_id (the foreign
+    keys that link a flight to existing client and airline records).
+    The Create panel must therefore render entry widgets for them, and
+    label_variable_mapping must know how to translate those labels into
+    the snake_case keys the backend expects.
+
+    At time of writing, the [2:] slice in build_panel skips the first
+    two flight labels (Client_ID and Airline ID), and
+    label_variable_mapping is missing both entries, so flights cannot
+    be created through the GUI. This test fails until both gaps are
+    closed."""
+
+    def test_flight_create_panel_offers_foreign_key_fields(self) -> None:
+        """show_panel for Flight on the create frame must populate the
+        widget store with Client_ID and Airline ID entries."""
+        store: dict = {}
+        view_controller.show_panel(
+            store, view_controller.create_options_frame, "Flight"
+        )
+        assert "Client_ID" in store, (
+            "Flight Create panel does not include a Client_ID field; "
+            "backend will reject every create attempt"
+        )
+        assert "Airline ID" in store, (
+            "Flight Create panel does not include an Airline ID field; "
+            "backend will reject every create attempt"
+        )
+
+    def test_flight_foreign_key_labels_are_mapped(self) -> None:
+        """label_variable_mapping must convert Client_ID -> client_id
+        and Airline ID -> airline_id so that prepare_payload can build
+        the backend payload without raising KeyError."""
+        mapping = view_controller.label_variable_mapping
+        assert mapping.get("Client_ID") == "client_id", (
+            "label_variable_mapping is missing 'Client_ID' -> 'client_id'; "
+            "prepare_payload would KeyError on Flight create"
+        )
+        assert mapping.get("Airline ID") == "airline_id", (
+            "label_variable_mapping is missing 'Airline ID' -> 'airline_id'; "
+            "prepare_payload would KeyError on Flight create"
+        )
 
 
 
