@@ -1,4 +1,7 @@
-from record import (JsonRecordRepository, RecordService, RecordConflictError, RecordNotFoundError, RecordValidationError)
+from record import (
+    RecordConflictError,
+    RecordNotFoundError,
+    RecordValidationError)
 from main import build_service, close_service
 import customtkinter as ctk
 import tkinter as tk
@@ -140,7 +143,6 @@ message_label = ctk.CTkLabel(
 message_label.grid(row=0, column=0, columnspan=4, pady=5)
 
 
-
 # Button Functions
 
 def prepare_payload(active_dictionary: dict, text):
@@ -247,7 +249,8 @@ def build_panel(frame, record_type, store):
     store.clear()
 
     if frame in (create_options_frame, update_options_frame):
-        for i, label in enumerate(client_box_labels[record_type][2:] if (frame == create_options_frame and record_type != "Flight")  else [label for label in client_box_labels[record_type] if label != "Type"]):
+        for i, label in enumerate(client_box_labels[record_type][2:] if (frame == create_options_frame and record_type != "Flight") else [
+                                  label for label in client_box_labels[record_type] if label != "Type"]):
             lbl = ctk.CTkLabel(frame, text=label, font=("Arial", 12))
             ent = ctk.CTkEntry(frame, width=150)
 
@@ -375,7 +378,7 @@ show_panel(search_widgets, search_options_frame, "Client")
 def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
-    if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
+    if option_types["Create"] == "Client" or option_types["Update"] == "Client":
         root.minsize(1200, 600)
     else:
         root.minsize(1200, 450)
@@ -389,11 +392,10 @@ def update_delete():
 def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
-    if option_types["Create"] == "Client" or option_types ["Update"] == "Client":
+    if option_types["Create"] == "Client" or option_types["Update"] == "Client":
         root.minsize(1200, 600)
     else:
         root.minsize(1200, 450)
-
 
 
 def update_search():
@@ -407,9 +409,11 @@ delete_value.trace_add("write", lambda *args: update_delete())
 update_value.trace_add("write", lambda *args: update_update())
 search_value.trace_add("write", lambda *args: update_search())
 
+
 def on_close():
     close_service()
     root.destroy()
+
 
 root.protocol("WM_DELETE_WINDOW", on_close)
 
