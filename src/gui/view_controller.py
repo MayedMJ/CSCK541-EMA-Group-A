@@ -17,7 +17,8 @@ service = build_service()
 title = "Airline Records Management System"
 root = tk.Tk()
 root.title(title)
-root.geometry("1200x720")
+root.geometry("1200x680")
+root.minsize(1200, 680)
 root.resizable(False, True)
 
 buttons_frame = ttk.Frame(root)
@@ -289,7 +290,7 @@ def build_panel(frame, record_type, store):
             store[label] = (lbl, ent)
         # Add a Results Textbox with border
         lbl = ctk.CTkLabel(frame, text="Results", font=("Arial", 12))
-        ent = ctk.CTkTextbox(frame, width=200, height=150, border_width=1, border_color="grey")
+        ent = ctk.CTkTextbox(frame, width=200, height=120, border_width=1, border_color="grey")
         lbl.grid(row=len(client_box_labels[record_type]), column=0, padx=10, pady=5, sticky="w")
         ent.grid(row=len(client_box_labels[record_type]), column=1, padx=10, pady=5, sticky="ew")
         store["Results"] = (lbl, ent)
@@ -390,7 +391,7 @@ def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
     if option_types["Search"] == "Client":
-        root.minsize(1200, 720)
+        root.minsize(1200, 680)
     elif option_types["Create"] == "Client" or option_types ["Update"] == "Client" or option_types ["Search"] == "Client":
         root.minsize(1200, 600)
     else:
@@ -406,7 +407,7 @@ def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
     if option_types["Search"] == "Client":
-        root.minsize(1200, 720)
+        root.minsize(1200, 680)
     elif option_types["Create"] == "Client" or option_types ["Update"] == "Client" or option_types ["Search"] == "Client":
         root.minsize(1200, 600)
     else:
@@ -417,7 +418,7 @@ def update_search():
     change_dropdown_value(search_value, "Search")
     show_panel(search_widgets, search_options_frame, option_types["Search"])
     if option_types["Search"] == "Client":
-        root.minsize(1200, 720)
+        root.minsize(1200, 680)
     elif option_types["Create"] == "Client" or option_types ["Update"] == "Client" or option_types ["Search"] == "Client":
         root.minsize(1200, 600)
     else:
