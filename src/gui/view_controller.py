@@ -17,8 +17,8 @@ service = build_service()
 title = "Airline Records Management System"
 root = tk.Tk()
 root.title(title)
-root.geometry("1200x680")
-root.minsize(1200, 680)
+root.geometry("1200x700")
+root.minsize(1200, 700)
 root.resizable(False, True)
 
 buttons_frame = ttk.Frame(root)
@@ -391,7 +391,7 @@ def update_create():
     change_dropdown_value(create_value, "Create")
     show_panel(create_widgets, create_options_frame, option_types["Create"])
     if option_types["Search"] == "Client":
-        root.minsize(1200, 680)
+        root.minsize(1200, 700)
     elif option_types["Create"] == "Client" or option_types ["Update"] == "Client" or option_types ["Search"] == "Client":
         root.minsize(1200, 600)
     else:
@@ -407,7 +407,7 @@ def update_update():
     change_dropdown_value(update_value, "Update")
     show_panel(update_widgets, update_options_frame, option_types["Update"])
     if option_types["Search"] == "Client":
-        root.minsize(1200, 680)
+        root.minsize(1200, 700)
     elif option_types["Create"] == "Client" or option_types ["Update"] == "Client" or option_types ["Search"] == "Client":
         root.minsize(1200, 600)
     else:
@@ -418,7 +418,7 @@ def update_search():
     change_dropdown_value(search_value, "Search")
     show_panel(search_widgets, search_options_frame, option_types["Search"])
     if option_types["Search"] == "Client":
-        root.minsize(1200, 680)
+        root.minsize(1200, 700)
     elif option_types["Create"] == "Client" or option_types ["Update"] == "Client" or option_types ["Search"] == "Client":
         root.minsize(1200, 600)
     else:
