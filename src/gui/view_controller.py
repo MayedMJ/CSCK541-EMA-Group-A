@@ -217,7 +217,7 @@ def prepare_action_data(text, record_type, store):
             store["Results"][1].delete("1.0", "end")
             for record in textbox_info:
                 for key, value in record.items():
-                    if key not in ("type", "id"):
+                    if key not in ("type"):
                         store["Results"][1].insert(
                             "end",
                             f"{variable_label_mapping[key]}: {value}\n"
