@@ -17,7 +17,7 @@ service = build_service()
 title = "Airline Records Management System"
 root = tk.Tk()
 root.title(title)
-root.geometry("1200x720")
+root.geometry("1200x700")
 root.resizable(False, True)
 
 buttons_frame = ttk.Frame(root)
