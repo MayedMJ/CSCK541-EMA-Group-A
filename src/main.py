@@ -34,11 +34,12 @@ def close_service() -> None:
 
 
 def main() -> None:
-    """Starts the application backend wiring."""
-    build_service()
+    """Starts the application GUI with backend service wiring."""
+    service = build_service()
     try:
-        # GUI wiring should call service methods from here.
-        pass
+        from gui.view_controller import run_gui
+
+        run_gui(service)
     finally:
         close_service()
 
