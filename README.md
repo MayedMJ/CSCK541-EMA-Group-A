@@ -6,6 +6,7 @@ Backend service for managing travel-agent records.
 
 - Python 3.10 or newer.
 - No third-party runtime dependencies are required for the backend service.
+- The GUI uses `customtkinter`.
 - Development tools for testing and linting are listed in `requirements.txt`.
 
 ## Setup
@@ -25,18 +26,23 @@ Alternatively, install the project with its development extras:
 python -m pip install -e ".[dev]"
 ```
 
-## Run the backend
+## Run the application
 
-Run the backend entry point:
+For marking or demonstration, start the full GUI application from the
+repository root:
 
 ```bash
 python src/main.py
 ```
 
 This initializes the shared `RecordService`, loads records from
-`src/data/record.json`, and closes the service cleanly. The GUI package is
-reserved for the interface layer; backend methods are exposed through
-`main.build_service()` and `main.close_service()`.
+`src/data/record.json`, opens the Tkinter GUI, and closes the service
+cleanly when the window is closed. If the GUI dependency is missing, install
+it with:
+
+```bash
+python -m pip install customtkinter
+```
 
 ## Run tests
 
