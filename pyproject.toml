@@ -10,6 +10,17 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "pytest-cov>=4,<7",
+    "ruff==0.15.12",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
@@ -17,9 +28,8 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.ruff]
-line-length = 88
+line-length = 79
 target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
-ignore = ["E501"]

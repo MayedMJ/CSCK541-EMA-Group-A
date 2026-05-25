@@ -14,7 +14,11 @@ from .contracts import (
     get_relation_dependencies,
 )
 from .error_messages import RecordErrorMessage
-from .exceptions import RecordConflictError, RecordNotFoundError, RecordValidationError
+from .exceptions import (
+    RecordConflictError,
+    RecordNotFoundError,
+    RecordValidationError,
+)
 from .immutability import freeze_record, thaw_record
 from .repository import RecordRepository
 from .validators import validate_record_payload, validate_stored_record
@@ -78,7 +82,9 @@ class RecordService:
         candidates = (
             self._records
             if record_type is None
-            else tuple(r for r in self._records if r.get("type") == record_type)
+            else tuple(
+                r for r in self._records if r.get("type") == record_type
+            )
         )
         matched: list[dict[str, Any]] = []
         for record in candidates:
@@ -99,7 +105,9 @@ class RecordService:
                 matched.append(thaw_record(record))
         return matched
 
-    def get_record(self, record_type: RecordType, record_id: int) -> dict[str, Any]:
+    def get_record(
+        self, record_type: RecordType, record_id: int
+    ) -> dict[str, Any]:
         normalized_id = self._normalize_record_id(record_id)
         idx = self._find_index(record_type, normalized_id)
         return thaw_record(self._records[idx])
@@ -118,7 +126,9 @@ class RecordService:
 
         normalized_payload = validate_record_payload(record_type, payload)
 
-        for related_type, related_field in get_relation_dependencies(record_type):
+        for related_type, related_field in get_relation_dependencies(
+            record_type
+        ):
             self._assert_related_record_exists(
                 related_type, normalized_payload[related_field]
             )
@@ -142,7 +152,9 @@ class RecordService:
         updates: dict[str, Any],
     ) -> dict[str, Any]:
         if not isinstance(updates, dict):
-            self._raise_validation_error("record_update_payload_not_dictionary")
+            self._raise_validation_error(
+                "record_update_payload_not_dictionary"
+            )
 
         normalized_id = self._normalize_record_id(record_id)
         idx = self._find_index(record_type, normalized_id)
@@ -156,7 +168,9 @@ class RecordService:
 
         updated.update(updates)
         normalized_payload = validate_record_payload(record_type, updated)
-        for related_type, related_field in get_relation_dependencies(record_type):
+        for related_type, related_field in get_relation_dependencies(
+            record_type
+        ):
             self._assert_related_record_exists(
                 related_type, normalized_payload[related_field]
             )
@@ -166,31 +180,44 @@ class RecordService:
         updated_record["type"] = record_type
 
         frozen = freeze_record(updated_record)
-        self._records = self._records[:idx] + (frozen,) + self._records[idx + 1 :]
+        self._records = (
+            self._records[:idx] + (frozen,) + self._records[idx + 1 :]
+        )
 
         LOGGER.info(
-            f"The record is updated with recordType: {record_type}, recordId: {normalized_id}"
+            "The record is updated with recordType: %s, recordId: %s",
+            record_type,
+            normalized_id,
         )
         return thaw_record(frozen)
 
-    def delete_record(self, record_type: RecordType, record_id: int) -> dict[str, Any]:
+    def delete_record(
+        self, record_type: RecordType, record_id: int
+    ) -> dict[str, Any]:
         normalized_id = self._normalize_record_id(record_id)
         related_key = get_flight_reference_field(record_type)
         if related_key is not None:
-            self._assert_no_related_flights(record_type, normalized_id, related_key)
+            self._assert_no_related_flights(
+                record_type, normalized_id, related_key
+            )
 
         idx = self._find_index(record_type, normalized_id)
         deleted = self._records[idx]
         self._records = self._records[:idx] + self._records[idx + 1 :]
 
         LOGGER.info(
-            f"The record is deleted with recordType: {record_type}, recordId: {normalized_id}"
+            "The record is deleted with recordType: %s, recordId: %s",
+            record_type,
+            normalized_id,
         )
         return thaw_record(deleted)
 
     def _find_index(self, record_type: RecordType, record_id: int) -> int:
         for index, record in enumerate(self._records):
-            if record.get("type") == record_type and record.get("id") == record_id:
+            if (
+                record.get("type") == record_type
+                and record.get("id") == record_id
+            ):
                 return index
 
         error_text = RecordErrorMessage.from_(
@@ -241,7 +268,10 @@ class RecordService:
     ) -> None:
         normalized_id = self._normalize_record_id(record_id)
         for record in self._records:
-            if record.get("type") == record_type and record.get("id") == normalized_id:
+            if (
+                record.get("type") == record_type
+                and record.get("id") == normalized_id
+            ):
                 return
 
         self._raise_validation_error(
@@ -257,7 +287,8 @@ class RecordService:
         related_key: str,
     ) -> None:
         has_related = any(
-            record.get("type") == FLIGHT_TYPE and record.get(related_key) == record_id
+            record.get("type") == FLIGHT_TYPE
+            and record.get(related_key) == record_id
             for record in self._records
         )
         if has_related:

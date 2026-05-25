@@ -31,8 +31,7 @@ class RecordErrorMessage:
             "payload type must be {record_type}"
         ),
         "record_id_cannot_be_changed": (
-            "The record update is not valid with reason: "
-            "id cannot be changed"
+            "The record update is not valid with reason: id cannot be changed"
         ),
         "record_payload_missing_field": (
             "The record payload is not valid with reason: "
@@ -84,10 +83,12 @@ class RecordErrorMessage:
             "item at index {index} must be a dictionary"
         ),
         "storage_read_failed": (
-            "The record storage cannot be read with path: {path}, reason: {reason}"
+            "The record storage cannot be read with path: {path}, "
+            "reason: {reason}"
         ),
         "storage_write_failed": (
-            "The record storage cannot be written with path: {path}, reason: {reason}"
+            "The record storage cannot be written with path: {path}, "
+            "reason: {reason}"
         ),
     }
 
@@ -95,5 +96,7 @@ class RecordErrorMessage:
     def from_(cls, key: str, **kwargs: object) -> str:
         """Returns a formatted message from a well known template key."""
         if key not in cls._TEMPLATES:
-            raise ValueError(f"The error message template is not found with key: {key}")
+            raise ValueError(
+                f"The error message template is not found with key: {key}"
+            )
         return cls._TEMPLATES[key].format(**kwargs)
